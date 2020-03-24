@@ -52,7 +52,7 @@ public class MenuTest {
         /****构建子菜单***/
         WxMenu.WxMenuButton menu3_1 = new WxMenu.WxMenuButton();
         menu3_1.setType("click");
-        menu3_1.setName("菜单3-1");
+        menu3_1.setName("菜单3-");
         menu3_1.setKey("menu3_1");
         WxMenu.WxMenuButton menu3_2 = new WxMenu.WxMenuButton();
         menu3_2.setType("click");
