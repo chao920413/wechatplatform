@@ -1,17 +1,29 @@
 package com.demo.wechatplatform.module.wechat.wechatPortal.controller;
 
+import com.demo.wechatplatform.config.RestTemplateUtil;
 import com.demo.wechatplatform.module.wechat.wechatPortal.dto.access_token;
+import com.demo.wechatplatform.module.wechat.wechatPortal.dto.userInfo;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import me.chanjar.weixin.mp.bean.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.WxMpXmlOutMessage;
 import me.chanjar.weixin.mp.bean.WxMpXmlOutTextMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/signUp")
 public class signUpController {
 
+    @Autowired
+    private RestTemplate restTemplate ;
   /*  @RequestMapping(value = "/signUp",method = RequestMethod.GET)
     public String signUp(@RequestParam(value = "signature") String signature,
                          @RequestParam(value = "timestamp") String timestamp,
@@ -44,12 +56,23 @@ public class signUpController {
     }
 
     @RequestMapping(value = "getWebToken_AcessByCode")
-    public String getUserInfo(@RequestBody access_token access_token){
-        RestTemplate restTemplate=new RestTemplate();
+    public Map<String,String> getUserInfo(@RequestBody access_token access_token){
+        RestTemplate restTemplate= RestTemplateUtil.getInstance();
         String url="https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code";
         url=String.format(url,"wx73da6c3a780f0ea2","92809e6b89e09737d59f9a69663c0a34",access_token.getCode());
-        access_token=restTemplate.getForObject(url,access_token.getClass());
-        return null;
+        Gson gson=new Gson();
+        access_token=  restTemplate.getForObject(url,access_token.getClass());
+
+
+        userInfo usrInfo=new userInfo();
+        String url_user="https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN";
+        url_user=String.format(url_user,access_token.getAccess_token(),access_token.getOpenid());
+        usrInfo=restTemplate.getForObject(url_user,usrInfo.getClass());
+        Map<String,String > map =new HashMap<>();
+        map.put("code", "200");
+        map.put("name",usrInfo.getNickname());
+        map.put("picture",usrInfo.getHeadimgurl());
+        return map;
     }
 
 }
